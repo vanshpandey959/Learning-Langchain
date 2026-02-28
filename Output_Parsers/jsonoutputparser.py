@@ -1,0 +1,28 @@
+from langchain_google_genai import ChatGoogleGenerativeAI
+from dotenv import load_dotenv
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
+
+load_dotenv()
+
+# Define the model
+model = ChatGoogleGenerativeAI(
+    model="models/gemini-flash-latest",
+)
+
+parser = JsonOutputParser()
+
+template = PromptTemplate(
+    template='Give me 5 facts about {topic} \n {format_instruction}',
+    input_variables=['topic'],
+    partial_variables={'format_instruction': parser.get_format_instructions()}
+)
+
+chain = template | model | parser
+
+result = chain.invoke({'topic':'black hole'})
+
+print(result)
+
+
+# The llm itself generates a json format for our output, but here we can not set our own schema of output
